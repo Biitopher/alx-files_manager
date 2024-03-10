@@ -1,52 +1,36 @@
 import { MongoClient } from 'mongodb';
 
+const DB_HOST = process.env.DB_HOST || 'localhost';
+const DB_PORT = process.env.DB_PORT || 27017;
+const DB_DATABASE = process.env.DB_DATABASE || 'files_manager';
+const url = `mongodb://${DB_HOST}/${DB_PORT}`;
+
 class DBClient {
-  /** Creates a DBClient instance **/
+  /** Creates a DBClient instance * */
   constructor() {
-    const {
-      DB_HOST = 'localhost',
-      DB_PORT = 27017,
-      DB_DATABASE = 'files_manager',
-    } = process.env;
-
-    this.client = new MongoClient(`mongodb://${DB_HOST}:${DB_PORT}`, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    this.isDBConnected = false;
-
-    this.client.connect((err) => {
-      if (err) {
-        console.error('MongoDB connection error:', err.message || err.toString());
-        this.isDBConnected = false;
+    MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
+      if (!err) {
+        this.client = client.db(DB_DATABASE);
+        this.usersCollection = this.client.collection('users');
+        this.filesCollection = this.client.collection('files');
       } else {
-        this.isDBConnected = true;
+        console.log(err.message);
+        this.client = false;
       }
     });
   }
 
   isAlive() {
-    return this.isDBConnected;
+    return Boolean(this.client);
   }
 
   async nbUsers() {
-    if (!this.isDBConnected) {
-      throw new Error('Database connection not established');
-    }
-
-    const usersCollection = this.client.db().collection('users');
-    const count = await usersCollection.countDocuments();
+    const count = this.usersCollection.countDocuments();
     return count;
   }
 
   async nbFiles() {
-    if (!this.isDBConnected) {
-      throw new Error('Database connection not established');
-    }
-
-    const filesCollection = this.client.db().collection('files');
-    const count = await filesCollection.countDocuments();
+    const count = this.filesCollection.countDocuments();
     return count;
   }
 }
