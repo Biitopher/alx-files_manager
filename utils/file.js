@@ -100,6 +100,17 @@ const fileUtils = {
 
     return { error: null, newFile };
   },
+
+  processFile(doc) {
+    // Changes _id for id and removes localPath
+
+    const file = { id: doc._id, ...doc };
+
+    delete file.localPath;
+    delete file._id;
+
+    return file;
+  },
 };
 
 export default fileUtils;
