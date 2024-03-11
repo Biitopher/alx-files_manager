@@ -5,20 +5,20 @@ class AppController {
   /**
    * Returns if Redis is alive and if the DB is alive
    **/
-  static getStatus(req, res) {
+  static getStatus(request, response) {
     const status = {
       redis: redisClient.isAlive(),
       db: dbClient.isAlive(),
     };
-    return res.status(200).send(status);
+    response.status(200).send(status);
   }
 
-  static async getStats(req, res) {
+  static async getStats(request, response) {
     const stats = {
       usersCount: await dbClient.nbUsers(),
       filesCount: await dbClient.nbFiles(),
     };
-    return res.status(200).send(stats);
+    response. status(200).send(stats);
   }
 }
 
