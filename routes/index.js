@@ -1,9 +1,9 @@
 import express from 'express';
-import routes from './index';
+import AppController from '../controllers/AppController';
 
-const app = express();
+const router = express.Router();
 
-// Load routes
-app.use('/', routes);
+router.get('/status', AppController.getStatus);
+router.get('/stats', AppController.getStats);
 
-export default app;
+export default router;
