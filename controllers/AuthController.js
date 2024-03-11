@@ -10,7 +10,7 @@ class AuthController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString('ascii');
+    const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString('utf-8');
     const [email, password] = credentials.split(':');
 
     const hashedPassword = sha1(password);
