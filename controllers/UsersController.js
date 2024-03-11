@@ -32,7 +32,7 @@ class UsersController {
     const result = await dbClient.usersCollection.insertOne(newUser);
 
     // Return the new user with only email and id
-    const { _id } = result.id;
+    const { _id } = result.insertedId;
     const createdUser = {
       id: _id,
       email,
