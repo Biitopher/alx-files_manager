@@ -29,8 +29,7 @@ class UsersController {
     };
 
     // Insert the new user into the database
-    const result = await (await dbClient.usersCollection()
-      .insertOne(newUser));
+    const result = await dbClient.usersCollection.insertOne(newUser);
 
     // Return the new user with only email and id
     const { _id } = result.insertedId.toString();
