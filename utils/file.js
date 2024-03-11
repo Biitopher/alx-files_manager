@@ -169,6 +169,11 @@ const fileUtils = {
     return { error: null, code: 200, updatedFile };
   },
 
+  async getFile(query) {
+    const file = await dbClient.filesCollection.findOne(query);
+    return file;
+  },
+
 };
 
 export default fileUtils;
