@@ -111,6 +111,12 @@ const fileUtils = {
 
     return file;
   },
+
+  async getFilesOfParentId(query) {
+    const fileList = await dbClient.filesCollection.aggregate(query);
+    return fileList;
+  },
+
 };
 
 export default fileUtils;
