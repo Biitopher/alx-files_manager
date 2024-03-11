@@ -7,7 +7,7 @@ class AppController {
     const dbAlive = dbClient.isAlive();
     const status = {
       redis: redisAlive,
-      db: dbAlive
+      db: dbAlive,
     };
     res.status(200).json(status);
   }
@@ -17,7 +17,7 @@ class AppController {
     const nbFiles = await dbClient.nbFiles();
     const stats = {
       users: nbUsers,
-      files: nbFiles
+      files: nbFiles,
     };
     res.status(200).json(stats);
   }
