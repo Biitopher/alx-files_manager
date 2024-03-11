@@ -1,7 +1,10 @@
 import { ObjectId } from 'mongodb';
 import sha1 from 'sha1';
+import Queue from 'bull';
 import dbClient from '../utils/db';
 import userUtils from '../utils/user';
+
+const userQueue = new Queue('userQueue');
 
 class UsersController {
   static async postNew(req, res) {
@@ -25,22 +28,27 @@ class UsersController {
     const hashedPassword = sha1(password);
 
     // Create a new user
-    const newUser = {
+    let result;
+    try {
+      result = await dbClient.usersCollection.insertOne({
+        email,
+        password: hashedPassword,
+      });
+    } catch (err) {
+      await userQueue.add({});
+      return res.status(500).send({ error: 'Error creating user.' });
+    }
+
+    const user = {
+      id: result.insertedId,
       email,
-      password: hashedPassword,
     };
 
-    // Insert the new user into the database
-    const result = await dbClient.usersCollection.insertOne(newUser);
+    await userQueue.add({
+      userId: result.insertedId.toString(),
+    });
 
-    // Return the new user with only email and id
-    const { _id } = result.insertedId.toString();
-    const createdUser = {
-      id: _id,
-      email,
-    };
-
-    return res.status(201).json(createdUser);
+    return res.status(201).send(user);
   }
 
   static async getMe(request, response) {
