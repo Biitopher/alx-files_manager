@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import Queue from 'bull';
+import mime from 'mime-types';
 import userUtils from '../utils/user';
 import fileUtils from '../utils/file';
 import basicUtils from '../utils/basic';
@@ -147,6 +148,44 @@ class FilesController {
     if (error) return response.status(code).send({ error });
 
     return response.status(code).send(updatedFile);
+  }
+
+  static async getFile(request, response) {
+    const fileId = request.params.id;
+
+    const { userId } = await userUtils.getUserIdAndKey(request);
+
+    const user = await userUtils.getUser({
+      _id: ObjectId(userId),
+    });
+
+    if (!user) return response.status(401).send({ error: 'Unauthorized' });
+
+    if (!basicUtils.isValidId(fileId) || !basicUtils.isValidId(userId)) {
+      return response.status(404).send({ error: 'Not found' });
+    }
+
+    const file = await fileUtils.getFile({
+      _id: ObjectId(fileId),
+      userId: ObjectId(userId),
+    });
+
+    if (!file) return response.status(404).send({ error: 'Not found' });
+
+    if (!file.isPublic && (!request.user || request.user.id !== file.userId)) {
+      return response.status(404).send({ error: 'Not found' });
+    }
+
+    if (file.type === 'folder') {
+      return response.status(400).send({ error: "A folder doesn't have content" });
+    }
+
+    const fileContent = "Hello Webstack!";
+
+    const mimeType = mime.lookup(file.name);
+
+    response.setHeader('Content-Type', mimeType);
+    return response.send(fileContent);
   }
 }
 
