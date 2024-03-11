@@ -139,7 +139,7 @@ class FilesController {
   }
 
   static async putUnpublish(request, response) {
-    const { error, code, updatedFile } = await fileUtils.publishUnpublish(
+    const { error, code, updatedFile } = await fileUtils.publishHandler(
       request,
       false,
     );
