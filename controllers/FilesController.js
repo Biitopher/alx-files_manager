@@ -151,41 +151,34 @@ class FilesController {
   }
 
   static async getFile(request, response) {
-    const fileId = request.params.id;
+    const { id: fileId } = request.params;
 
     const { userId } = await userUtils.getUserIdAndKey(request);
 
-    const user = await userUtils.getUser({
-      _id: ObjectId(userId),
-    });
+    const size = request.query.size || 0;
 
-    if (!user) return response.status(401).send({ error: 'Unauthorized' });
-
-    if (!basicUtils.isValidId(fileId) || !basicUtils.isValidId(userId)) {
-      return response.status(404).send({ error: 'Not found' });
-    }
+    if (!basicUtils.isValidId(fileId)) { return response.status(404).send({ error: 'Not found' }); }
 
     const file = await fileUtils.getFile({
       _id: ObjectId(fileId),
-      userId: ObjectId(userId),
     });
 
-    if (!file) return response.status(404).send({ error: 'Not found' });
-
-    if (!file.isPublic && (!request.user || request.user.id !== file.userId)) {
-      return response.status(404).send({ error: 'Not found' });
-    }
+    if (!file || !fileUtils.isOwnerAndPublic(file, userId)) { 
+      return response.status(404).send({ error: 'Not found' }); }
 
     if (file.type === 'folder') {
       return response.status(400).send({ error: "A folder doesn't have content" });
     }
 
-    const fileContent = "Hello Webstack!";
+    const { error, code, fileContent} = await fileUtils.getFileData(file, size);
+
+    if (error) return response.status(code).send({ error });
 
     const mimeType = mime.lookup(file.name);
 
     response.setHeader('Content-Type', mimeType);
-    return response.send(fileContent);
+
+    return response.status(200).send(fileContent);
   }
 }
 
