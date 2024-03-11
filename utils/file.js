@@ -174,6 +174,15 @@ const fileUtils = {
     return file;
   },
 
+  async updateFile(query, set) {
+    const fileList = await dbClient.filesCollection.findOneAndUpdate(
+      query,
+      set,
+      { returnOriginal: false },
+    );
+    return fileList;
+  },
+
 };
 
 export default fileUtils;
