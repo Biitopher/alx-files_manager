@@ -183,6 +183,31 @@ const fileUtils = {
     return fileList;
   },
 
+  isOwnerAndPublic(file, userId) {
+    if (
+      (!file.isPublic && !userId)
+      || (userId && file.userId.toString() !== userId && !file.isPublic)
+    ) { return false; }
+
+    return true;
+  },
+
+  async getFileData(file, size) {
+    let { localPath } = file;
+    let data;
+
+    if (size) localPath = `${localPath}_${size}`;
+
+    try {
+      data = await fsPromises.readFile(localPath);
+    } catch (err) {
+      // console.log(err.message);
+      return { error: 'Not found', code: 404 };
+    }
+
+    return { data };
+  },
+
 };
 
 export default fileUtils;
