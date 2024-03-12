@@ -49,6 +49,7 @@ fileQueue.process(async (job) => {
 
 userQueue.process(async (job) => {
   const { userId } = job.data;
+
   if (!userId) {
     console.log('Missing userId');
     throw new Error('Missing userId');
@@ -61,4 +62,6 @@ userQueue.process(async (job) => {
   });
 
   if (!user) throw new Error('User not found');
+
+  console.log(`Welcome ${user.email}!`);
 });

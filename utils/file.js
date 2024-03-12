@@ -75,7 +75,6 @@ const fileUtils = {
     if (fileParams.type !== 'folder') {
       const fileNameUUID = uuidv4();
 
-      // const fileDataDecoded = Buffer.from(data, 'base64').toString('utf-8');
       const fileDataDecoded = Buffer.from(data, 'base64');
 
       const path = `${FOLDER_PATH}/${fileNameUUID}`;
@@ -91,9 +90,6 @@ const fileUtils = {
     }
 
     const result = await dbClient.filesCollection.insertOne(query);
-
-    // query.userId = query.userId.toString();
-    // query.parentId = query.parentId.toString();
 
     const file = this.processFile(query);
 
