@@ -36,7 +36,7 @@ class UsersController {
       });
     } catch (err) {
       await userQueue.add({});
-      return res.status(500).send({ error: 'Error creating user.' });
+      return res.status(500).json({ error: 'Error creating user.' });
     }
 
     const user = {
@@ -48,7 +48,7 @@ class UsersController {
       userId: result.insertedId.toString(),
     });
 
-    return res.status(201).send(user);
+    return res.status(201).json(user);
   }
 
   static async getMe(request, response) {
@@ -58,13 +58,13 @@ class UsersController {
       _id: ObjectId(userId),
     });
 
-    if (!user) return response.status(401).send({ error: 'Unauthorized' });
+    if (!user) return response.status(401).json({ error: 'Unauthorized' });
 
     const processedUser = { id: user._id, ...user };
     delete processedUser._id;
     delete processedUser.password;
 
-    return response.status(200).send(processedUser);
+    return response.status(200).json(processedUser);
   }
 }
 
